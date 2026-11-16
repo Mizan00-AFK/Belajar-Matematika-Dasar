@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="description" content="Aplikasi Pembelajaran Matematika Dasar Interaktif untuk Chromebook dan Laptop">
+    <title>Belajar Matematika - Belajar Berhitung Interaktif</title>
+    
+    <!-- PWA Manifest & App Icons -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Background Floating Math Elements -->
+    <div class="bg-math-particles" aria-hidden="true">
+        <span class="p-float" style="top:10%; left:5%;">+</span>
+        <span class="p-float" style="top:25%; right:8%;">×</span>
+        <span class="p-float" style="top:60%; left:8%;">−</span>
+        <span class="p-float" style="top:75%; right:6%;">÷</span>
+        <span class="p-float" style="top:85%; left:18%;">%</span>
+        <span class="p-float" style="top:15%; left:85%;">=</span>
+        <span class="p-float" style="top:45%; right:14%;">★</span>
+    </div>
+
+    <div class="app-container">
+        <!-- Header Aplikasi -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-avatar">
+                    <span class="brand-star">⭐</span>
+                </div>
+                <div class="brand-info">
+                    <h1>Belajar Matematika</h1>
+                    <p>Latihan Berhitung Ceria & Interaktif</p>
+                </div>
+            </div>
+
+            <!-- Skor & Bintang -->
+            <div class="header-badges">
+                <div class="badge streak-badge" title="Jawaban Benar Beruntun (Streak)">
+                    <span class="badge-icon-flame">🔥</span>
+                    <div class="badge-info">
+                        <span class="badge-label">Streak</span>
+                        <span id="streak-count" class="badge-num">0</span>
+                    </div>
+                </div>
+                <div class="badge star-badge" title="Total Bintang Terkumpul">
+                    <span class="badge-icon-star">⭐</span>
+                    <div class="badge-info">
+                        <span class="badge-label">Bintang</span>
+                        <span id="star-count" class="badge-num">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aksi Header (Suara, Papan Cakar, Statistik) -->
+            <div class="header-actions">
+                <button id="toggle-sound-btn" class="action-pill active" title="Nyalakan / Matikan Suara">
+                    <svg class="pill-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    </svg>
+                    <span>Suara: ON</span>
+                </button>
+
+                <button id="toggle-scratchpad-btn" class="action-pill" title="Buka Papan Cakar-cakar untuk hitung susun">
+                    <svg class="pill-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    <span>Papan Cakar</span>
+                </button>
+
+                <button id="stats-btn" class="action-pill" title="Lihat Statistik & Raport Belajar">
+                    <svg class="pill-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M18 20V10"/>
+                        <path d="M12 20V4"/>
+                        <path d="M6 20v-6"/>
+                    </svg>
+                    <span>Raport</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Bar Kontrol (Operasi, Tingkat, Variasi, Mode) -->
+        <section class="control-bar">
+            <!-- Pilihan Operasi Matematika -->
+            <div class="operation-tabs">
+                <button class="op-btn active op-add" data-op="add" title="Penjumlahan">
+                    <span class="op-sym">+</span>
+                    <span class="op-title">Tambah</span>
+                </button>
+                <button class="op-btn op-sub" data-op="sub" title="Pengurangan">
+                    <span class="op-sym">−</span>
+                    <span class="op-title">Kurang</span>
+                </button>
+                <button class="op-btn op-mul" data-op="mul" title="Perkalian">
+                    <span class="op-sym">×</span>
+                    <span class="op-title">Kali</span>
+                </button>
+                <button class="op-btn op-div" data-op="div" title="Pembagian">
+                    <span class="op-sym">÷</span>
+                    <span class="op-title">Bagi</span>
+                </button>
+                <button class="op-btn op-mixed" data-op="mixed" title="Campuran Semua Operasi">
+                    <span class="op-sym">🔀</span>
+                    <span class="op-title">Campur</span>
+                </button>
+            </div>
+
+            <!-- Filter Tingkat & Variasi -->
+            <div class="filter-group">
+                <div class="pill-dropdown-wrapper">
+                    <span class="filter-icon">🎯</span>
+                    <label for="level-select">Level:</label>
+                    <select id="level-select" class="custom-select">
+                        <option value="satuan">Level 1: Satuan (1 - 9)</option>
+                        <option value="belasan">Level 2: Belasan (10 - 50)</option>
+                        <option value="puluhan">Level 3: Puluhan (10 - 99)</option>
+                        <option value="ratusan">Level 4: Ratusan (100 - 999)</option>
+                        <option value="ribuan">Level 5: Ribuan (1.000 - 9.999)</option>
+                        <option value="tabel">Tabel Perkalian (1 - 10)</option>
+                    </select>
+                </div>
+
+                <div class="pill-dropdown-wrapper">
+                    <span class="filter-icon">🎨</span>
+                    <label for="variety-select">Variasi:</label>
+                    <select id="variety-select" class="custom-select">
+                        <option value="auto">Acak Cerdas (Campur Variasi)</option>
+                        <option value="standard">Standar (A + B = ?)</option>
+                        <option value="missing">Angka Hilang (? + B = C)</option>
+                        <option value="compare">Perbandingan (&lt;, =, &gt;)</option>
+                        <option value="story">Soal Cerita Interaktif</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Mode Pilihan: Santai, Kuis, Tantangan Waktu -->
+            <div class="mode-tabs">
+                <button class="mode-pill active" data-mode="practice">🌱 Latihan Santai</button>
+                <button class="mode-pill" data-mode="quiz">🏆 Mode Kuis</button>
+                <button class="mode-pill" data-mode="time">⚡ Waktu 60d</button>
+            </div>
+        </section>
+
+        <!-- Progress Bar Kuis & Stopwatch Waktu (Khusus mode kuis) -->
+        <div id="quiz-progress-bar-container" class="quiz-progress-card" style="display: none;">
+            <div class="progress-info">
+                <span id="quiz-progress-text" class="progress-badge">Soal 1 dari 10</span>
+                <div class="quiz-stopwatch" id="quiz-stopwatch-container">
+                    <span class="sw-icon">⏱️</span>
+                    <span class="sw-label">Waktu:</span>
+                    <span id="quiz-stopwatch-value" class="sw-val">00:00</span>
+                </div>
+            </div>
+            <div class="progress-track">
+                <div id="quiz-progress-fill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Timer Tantangan Waktu (Khusus mode waktu) -->
+        <div id="timer-container" class="timer-pill-card" style="display: none;">
+            <span class="timer-icon">⏱️</span>
+            <span class="timer-lbl">Waktu Tersisa:</span>
+            <span id="timer-value" class="timer-val">60s</span>
+        </div>
+
+        <!-- Workspace Utama (Kartu Soal + Papan Cakar) -->
+        <main class="workspace-grid" id="workspace-grid">
+            <!-- ================= HALAMAN PERSIAPAN KUIS ================= -->
+            <div class="prep-card animate-pop" id="quiz-prep-card" style="display: none;">
+                <div class="prep-header">
+                    <div class="prep-icon-badge badge-trophy">🏆</div>
+                    <div class="prep-header-text">
+                        <h2>Persiapan Kuis Matematika</h2>
+                        <p>Uji kemampuan berhitungmu dan raih nilai bintang terbaik!</p>
+                    </div>
+                </div>
+
+                <div class="prep-summary-grid">
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Operasi:</span>
+                        <span class="psi-val" id="quiz-prep-op">Tambah (+)</span>
+                    </div>
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Tingkat:</span>
+                        <span class="psi-val" id="quiz-prep-level">Level 1: Satuan</span>
+                    </div>
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Variasi Soal:</span>
+                        <span class="psi-val" id="quiz-prep-variety">Campur Otomatis</span>
+                    </div>
+                </div>
+
+                <!-- Pilihan Jumlah Soal (10, 15, atau 20 Soal) -->
+                <div class="prep-length-section">
+                    <span class="prep-length-title">🎯 Pilih Jumlah Soal:</span>
+                    <div class="length-options-group">
+                        <button class="length-choice-pill active" data-len="10">
+                            <span class="len-num">10</span>
+                            <span class="len-text">Soal</span>
+                        </button>
+                        <button class="length-choice-pill" data-len="15">
+                            <span class="len-num">15</span>
+                            <span class="len-text">Soal</span>
+                        </button>
+                        <button class="length-choice-pill" data-len="20">
+                            <span class="len-num">20</span>
+                            <span class="len-text">Soal</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="prep-rules-box">
+                    <div class="rule-item">
+                        <span class="rule-icon">⏱️</span>
+                        <span><strong>Waktu Dihitung Otomatis:</strong> Stopwatch akan berjalan dari 0 sampai selesai dan dicatat di dalam Rapor!</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">✏️</span>
+                        <span><strong>Papan Cakar Siaga:</strong> Buka papan cakar kapan saja jika ingin coret-coret hitung susun.</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">⭐</span>
+                        <span><strong>Bintang Prestasi:</strong> Kerjakan dengan teliti untuk meraih predikat Bintang Matematika!</span>
+                    </div>
+                </div>
+
+                <div class="prep-actions">
+                    <button id="start-quiz-btn" class="start-session-btn btn-trophy">
+                        <span>🚀 MULAI KERJAKAN KUIS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= HALAMAN PERSIAPAN TANTANGAN WAKTU ================= -->
+            <div class="prep-card animate-pop" id="time-prep-card" style="display: none;">
+                <div class="prep-header">
+                    <div class="prep-icon-badge badge-lightning">⚡</div>
+                    <div class="prep-header-text">
+                        <h2>Tantangan Waktu 60 Detik</h2>
+                        <p>Berapa banyak soal yang bisa kamu jawab dalam 1 menit?</p>
+                    </div>
+                </div>
+
+                <div class="prep-summary-grid">
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Operasi:</span>
+                        <span class="psi-val" id="time-prep-op">Tambah (+)</span>
+                    </div>
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Tingkat:</span>
+                        <span class="psi-val" id="time-prep-level">Level 1: Satuan</span>
+                    </div>
+                    <div class="prep-summary-item">
+                        <span class="psi-lbl">Batas Waktu:</span>
+                        <span class="psi-val" style="color: #ea580c; font-weight: 900;">60 Detik</span>
+                    </div>
+                </div>
+
+                <div class="prep-rules-box">
+                    <div class="rule-item">
+                        <span class="rule-icon">⚡</span>
+                        <span><strong>Kecepatan & Ketelitian:</strong> Jawab secepat dan setepat mungkin sebelum waktu habis!</span>
+                    </div>
+                    <div class="rule-item">
+                        <span class="rule-icon">🔥</span>
+                        <span><strong>Kumpulkan Streak:</strong> Setiap jawaban benar berturut-turut akan melipatgandakan poinmu!</span>
+                    </div>
+                </div>
+
+                <div class="prep-actions">
+                    <button id="start-time-btn" class="start-session-btn btn-lightning">
+                        <span>⚡ MULAI TANTANGAN SEKARANG!</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Kartu Soal Utama & Numpad Isian Langsung -->
+            <div class="question-panel" id="question-panel">
+                <div class="question-top-bar">
+                    <div class="prompt-badge">
+                        <span class="prompt-icon">💡</span>
+                        <span class="prompt-text" id="question-prompt-text">Hitunglah hasil operasi di bawah ini:</span>
+                    </div>
+                    
+                    <div class="question-tool-actions">
+                        <button id="toggle-vertical-btn" class="mini-tool-btn" style="display: none;" title="Ubah tampilan ke Hitung Susun Ke Bawah">
+                            <span>📋 Hitung Susun</span>
+                        </button>
+                        <button id="speech-btn" class="mini-tool-btn" title="Bacakan Soal dengan Suara">
+                            <span>🔊 Bacakan</span>
+                        </button>
+                        <button id="hint-btn" class="mini-tool-btn" title="Lihat Petunjuk & Langkah Hitung">
+                            <span>💡 Petunjuk</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tampilan Soal Besar & Interaktif -->
+                <div class="question-display-area" id="question-display-area">
+                    <!-- Diisi dinamis oleh JavaScript -->
+                </div>
+
+                <!-- Kontrol Isian: Numpad Grid Langsung ATAU Kartu Perbandingan -->
+                <div class="interactive-input-zone">
+                    <!-- 1. NUMPAD GRID LANGSUNG (Untuk Isian Angka Satuan/Puluhan/Ratusan/Ribuan/Cerita) -->
+                    <div class="numpad-wrapper" id="numpad-wrapper">
+                        <div class="numpad-grid" id="numpad-grid">
+                            <button class="num-key" data-val="1">1</button>
+                            <button class="num-key" data-val="2">2</button>
+                            <button class="num-key" data-val="3">3</button>
+                            <button class="num-key" data-val="4">4</button>
+                            <button class="num-key" data-val="5">5</button>
+                            <button class="num-key" data-val="6">6</button>
+                            <button class="num-key" data-val="7">7</button>
+                            <button class="num-key" data-val="8">8</button>
+                            <button class="num-key" data-val="9">9</button>
+                            <button class="num-key action-key key-clear" data-val="clear" title="Bersihkan Angka">C</button>
+                            <button class="num-key" data-val="0">0</button>
+                            <button class="num-key action-key key-backspace" data-val="backspace" title="Hapus Satu Angka">⌫</button>
+                        </div>
+
+                        <!-- Tombol Submit Jawaban & Soal Selanjutnya -->
+                        <div class="numpad-actions-row">
+                            <button id="submit-btn" class="submit-btn" title="Tekan Enter pada keyboard Chromebook">
+                                <span class="btn-check-icon">✓</span>
+                                <span class="btn-label">KIRIM JAWABAN</span>
+                                <span class="btn-key-hint">(Enter)</span>
+                            </button>
+                            <button id="next-btn" class="next-btn hidden">
+                                <span class="btn-label">SOAL BERIKUTNYA</span>
+                                <span class="btn-arrow-icon">➔</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. KARTU PERBANDINGAN KHUSUS (<, =, >) -->
+                    <div class="compare-wrapper" id="compare-wrapper" style="display: none;">
+                        <p class="compare-instruction">Pilih salah satu tanda perbandingan di bawah:</p>
+                        <div class="compare-cards-grid">
+                            <button class="compare-card" data-val="<">
+                                <span class="cmp-glyph">&lt;</span>
+                                <span class="cmp-label">Lebih Kecil Dari</span>
+                                <span class="cmp-desc">Sisi kiri bernilai lebih sedikit</span>
+                            </button>
+                            <button class="compare-card" data-val="=">
+                                <span class="cmp-glyph">=</span>
+                                <span class="cmp-label">Sama Dengan</span>
+                                <span class="cmp-desc">Kedua sisi memiliki nilai yang sama</span>
+                            </button>
+                            <button class="compare-card" data-val=">">
+                                <span class="cmp-glyph">&gt;</span>
+                                <span class="cmp-label">Lebih Besar Dari</span>
+                                <span class="cmp-desc">Sisi kiri bernilai lebih banyak</span>
+                            </button>
+                        </div>
+                        <div class="compare-actions-row">
+                            <button id="compare-submit-btn" class="submit-btn" title="Kirim tanda perbandingan terpilih">
+                                <span class="btn-check-icon">✓</span>
+                                <span class="btn-label">KIRIM JAWABAN INI</span>
+                            </button>
+                            <button id="compare-next-btn" class="next-btn hidden">
+                                <span class="btn-label">SOAL BERIKUTNYA</span>
+                                <span class="btn-arrow-icon">➔</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banner Feedback Dinamis (Benar / Belum Tepat) -->
+                <div id="feedback-box" class="feedback-box hidden"></div>
+            </div>
+
+            <!-- Papan Cakar-cakar Interaktif (Chalkboard / Canvas Slate) -->
+            <aside class="scratchpad-panel" id="scratchpad-panel">
+                <div class="scratchpad-header">
+                    <div class="scratchpad-title">
+                        <span class="sp-icon">✏️</span>
+                        <span>Oret-oretan</span>
+                    </div>
+                    <div class="scratchpad-tools">
+                        <div class="sp-color-picker">
+                            <button class="sp-color-dot selected" data-color="#1e3a8a" style="background: #1e3a8a;" title="Spidol Biru"></button>
+                            <button class="sp-color-dot" data-color="#b91c1c" style="background: #b91c1c;" title="Spidol Merah (Simpanan)"></button>
+                            <button class="sp-color-dot" data-color="#15803d" style="background: #15803d;" title="Spidol Hijau"></button>
+                            <button class="sp-color-dot" data-color="#1e293b" style="background: #1e293b;" title="Pensil Hitam"></button>
+                        </div>
+                        <button id="sp-eraser" class="sp-tool-btn" title="Penghapus">Hapus</button>
+                        <button id="sp-undo" class="sp-tool-btn" title="Kembalikan (Undo)">↺</button>
+                        <button id="sp-clear" class="sp-tool-btn" title="Bersihkan Papan">Bersih</button>
+                    </div>
+                </div>
+                <div class="scratchpad-canvas-wrapper">
+                    <canvas id="scratchpad-canvas"></canvas>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- ================= MODAL RAPORT KUIS ================= -->
+    <div id="quiz-result-modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-top">
+                <span class="modal-top-icon">🏆</span>
+                <h3>Rapor Hasil Belajar</h3>
+            </div>
+            <div class="modal-content-scroll">
+                <div class="result-stars-badge" id="result-stars-badge">⭐⭐⭐</div>
+                <div class="result-score-text" id="result-score-text">10 / 10</div>
+                <div class="result-percentage-text" id="result-percentage-text">Nilai: 100</div>
+                <p class="result-grade-message" id="result-grade-message">Luar Biasa Sempurna! Kamu Sang Bintang Matematika!</p>
+                
+                <!-- Rincian Waktu Pengerjaan Kuis (Aspek Waktu di Rapor) -->
+                <div class="result-time-row" id="result-time-row">
+                    <div class="result-time-card">
+                        <span class="rtc-icon">⏱️</span>
+                        <div class="rtc-text">
+                            <span class="rtc-lbl">Total Waktu Pengerjaan:</span>
+                            <span class="rtc-val" id="result-total-time">01:25</span>
+                        </div>
+                    </div>
+                    <div class="result-time-card">
+                        <span class="rtc-icon">⚡</span>
+                        <div class="rtc-text">
+                            <span class="rtc-lbl">Rata-rata Waktu / Soal:</span>
+                            <span class="rtc-val" id="result-avg-time">8.5 detik</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="review-title">Evaluasi Pengerjaan Soal:</h4>
+                <div class="review-list" id="quiz-review-list"></div>
+
+                <div class="modal-btn-row">
+                    <button id="quiz-retry-btn" class="modal-btn btn-primary">Ulangi Kuis</button>
+                    <button id="quiz-home-btn" class="modal-btn btn-secondary">Kembali ke Latihan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL HINT / CARA HITUNG ================= -->
+    <div id="hint-modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-top">
+                <div class="modal-top-title">
+                    <span class="modal-top-icon">💡</span>
+                    <h3>Panduan Cara Menghitung</h3>
+                </div>
+                <button class="modal-close-x" id="close-hint-modal">&times;</button>
+            </div>
+            <div class="modal-content-scroll" id="hint-modal-content">
+                <!-- Diisi dinamis -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL STATISTIK / RAPORT ================= -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-card">
+            <div class="modal-top">
+                <div class="modal-top-title">
+                    <span class="modal-top-icon">📊</span>
+                    <h3>Statistik & Capaian Belajar</h3>
+                </div>
+                <button class="modal-close-x" id="close-stats-modal">&times;</button>
+            </div>
+            <div class="modal-content-scroll">
+                <div class="stat-summary-grid">
+                    <div class="stat-box">
+                        <div class="stat-box-num" id="stat-total-q">0</div>
+                        <div class="stat-box-lbl">Total Soal Dijawab</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box-num" id="stat-total-c">0</div>
+                        <div class="stat-box-lbl">Jawaban Benar</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box-num" id="stat-accuracy">0%</div>
+                        <div class="stat-box-lbl">Tingkat Akurasi</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-box-num" id="stat-best-streak">0</div>
+                        <div class="stat-box-lbl">Streak Terbaik 🔥</div>
+                    </div>
+                </div>
+
+                <h4 class="history-title">Riwayat 20 Kuis Terakhir:</h4>
+                <div class="history-list" id="stats-history-list"></div>
+
+                <div class="reset-wrapper">
+                    <button id="reset-stats-btn" class="reset-btn">Reset Data Belajar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Module -->
+    <script src="js/audio.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/scratchpad.js"></script>
+    <script src="js/generator.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

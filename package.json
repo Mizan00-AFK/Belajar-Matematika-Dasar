@@ -1,0 +1,12 @@
+{
+  "name": "bintang-matematika",
+  "version": "1.0.0",
+  "description": "Aplikasi Pembelajaran Matematika Dasar Interaktif untuk Chromebook",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["chromebook", "pwa", "math", "education", "elementary"],
+  "author": "",
+  "license": "MIT"
+}
