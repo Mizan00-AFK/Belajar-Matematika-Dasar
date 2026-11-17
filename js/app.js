@@ -628,8 +628,10 @@ class MathApp {
 
         // Tampilkan toggle hitung susun jika soal mendukung
         if (toggleVerticalBtn) {
-            if (q.layoutType === 'vertical_capable') {
+            if (q.layoutType === 'vertical_capable' || q.layoutType === 'division_capable') {
                 toggleVerticalBtn.style.display = 'inline-flex';
+                toggleVerticalBtn.querySelector('span').textContent =
+                    q.layoutType === 'division_capable' ? '📋 Porogapit' : '📋 Hitung Susun';
             } else {
                 toggleVerticalBtn.style.display = 'none';
                 this.isVerticalView = false;
@@ -647,7 +649,25 @@ class MathApp {
         }
 
         // Render Format Soal
-        if (this.isVerticalView && q.layoutType === 'vertical_capable') {
+        if (this.isVerticalView && q.layoutType === 'division_capable') {
+            container.innerHTML = `
+                <div class="long-division-card animate-pop">
+                    <div class="long-division-quotient">
+                        <div class="interactive-slot inline-slot" id="main-answer-slot">
+                            <span class="slot-text" id="slot-text">?</span>
+                            <span class="cursor-blink">|</span>
+                        </div>
+                    </div>
+                    <div class="long-division-work">
+                        <div class="long-division-divisor">${window.mathGenerator.formatNumber(q.b)}</div>
+                        <div class="long-division-dividend">
+                            <div class="long-division-bar">${window.mathGenerator.formatNumber(q.a)}</div>
+                        </div>
+                    </div>
+                    <div class="long-division-caption">Porogapit</div>
+                </div>
+            `;
+        } else if (this.isVerticalView && q.layoutType === 'vertical_capable') {
             // Tampilan Hitung Susun Ke Bawah
             container.innerHTML = `
                 <div class="vertical-math-card animate-pop">
@@ -1075,6 +1095,16 @@ class MathApp {
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'id-ID';
+        const indonesianVoice = window.speechSynthesis.getVoices()
+            .filter(voice => voice.lang && voice.lang.toLowerCase().startsWith('id'))
+            .sort((a, b) => {
+                const aExact = a.lang.toLowerCase() === 'id-id' ? 1 : 0;
+                const bExact = b.lang.toLowerCase() === 'id-id' ? 1 : 0;
+                return bExact - aExact;
+            })[0];
+        if (indonesianVoice) {
+            utterance.voice = indonesianVoice;
+        }
         utterance.rate = 0.9;
         window.speechSynthesis.speak(utterance);
     }

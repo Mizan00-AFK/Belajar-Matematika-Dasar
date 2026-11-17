@@ -147,6 +147,9 @@ class MathGenerator {
             if (['puluhan', 'ratusan', 'ribuan'].includes(level) && (op === 'add' || op === 'sub' || op === 'mul')) {
                 layoutType = 'vertical_capable';
             }
+            if (op === 'div') {
+                layoutType = 'division_capable';
+            }
         } else if (variety === 'missing') {
             const pickLeft = Math.random() < 0.5;
             if (pickLeft) {

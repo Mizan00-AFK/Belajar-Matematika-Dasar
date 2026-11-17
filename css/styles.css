@@ -1051,6 +1051,60 @@ body {
     justify-content: flex-end;
 }
 
+/* Format Pembagian Porogapit */
+.long-division-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 36px;
+    color: #1e293b;
+    font-family: monospace, sans-serif;
+}
+
+.long-division-quotient {
+    min-width: 190px;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 0 8px 54px;
+}
+
+.long-division-quotient .interactive-slot {
+    min-width: 140px;
+}
+
+.long-division-work {
+    display: flex;
+    align-items: flex-start;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.long-division-divisor {
+    padding: 12px 16px 0 0;
+    color: #4f46e5;
+}
+
+.long-division-dividend {
+    min-width: 190px;
+    padding: 12px 0 0 16px;
+    border-left: 5px solid #1e293b;
+    border-top: 5px solid #1e293b;
+    border-radius: 12px 0 0 0;
+}
+
+.long-division-bar {
+    letter-spacing: 5px;
+}
+
+.long-division-caption {
+    margin-top: 18px;
+    color: #64748b;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+}
+
 /* Format Soal Cerita */
 .story-math-card {
     width: 100%;
